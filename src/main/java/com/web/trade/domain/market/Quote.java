@@ -1,33 +1,28 @@
 package com.web.trade.domain.market;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 /**
- * 気配クラス
+ * 気配
  */
-@Getter
-@AllArgsConstructor
-public class Quote implements Comparable<Quote> {
+public interface Quote {
 
-	/** COMPARATOR */
-	private static Comparator<Integer> COMPARATOR = Comparator.nullsFirst(Comparator.naturalOrder());
+	/**
+	 * 価格取得
+	 * @return price
+	 */
+	BigDecimal getPrice();
 
-	/** index */
-	private final Integer index;
+	/**
+	 * 数量取得
+	 * @return qty
+	 */
+	BigDecimal getQty();
 
-	/** price */
-	private final BigDecimal price;
-
-	/** quantity */
-	private final BigDecimal quantity;
-
-	@Override
-	public int compareTo(final Quote other) {
-		return COMPARATOR.compare(this.index, other.index);
-	}
+	/**
+	 * より良い気配か
+	 * @return better
+	 */
+	boolean isBetterOrEqual(BigDecimal price);
 
 }
