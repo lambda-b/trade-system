@@ -3,12 +3,13 @@ package com.web.trade.domain.market;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
+@Builder(builderClassName = "Builder")
 public class OrderBook {
 
 	/** 予想約定価格 */
@@ -70,10 +71,40 @@ public class OrderBook {
 		return getBetterQty(bestPrice, bidFull);
 	}
 
-	private static <T extends Quote> BigDecimal getBetterQty(final BigDecimal price, final Collection<T> collection) {
+	private static <T extends Quote<T>> BigDecimal getBetterQty(final BigDecimal price,
+			final Collection<T> collection) {
 		return collection.stream()
 				.filter(e -> e.isBetterOrEqual(price))
 				.map(Quote::getQty)
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
+	}
+
+	public static class Builder {
+
+		/** askFull */
+		private List<AskQuote> askFull;
+
+		/** bidFull */
+		private List<BidQuote> bidFull;
+
+		/**
+		 * askFull設定
+		 * @param askFull
+		 * @return builder
+		 */
+		public Builder askFull(final List<AskQuote> askFull) {
+			this.askFull = askFull.stream().sorted().collect(Collectors.toList());
+			return this;
+		}
+
+		/**
+		 * bidFull設定
+		 * @param bidFull
+		 * @return builder
+		 */
+		public Builder bidFull(final List<BidQuote> bidFull) {
+			this.bidFull = bidFull.stream().sorted().collect(Collectors.toList());
+			return this;
+		}
 	}
 }

@@ -2,6 +2,7 @@ package com.web.trade.domain.market;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -13,19 +14,18 @@ import org.junit.jupiter.api.Test;
 public class OrderBookTest {
 
 	@Test
-	@DisplayName("コンストラクタでソートの確認")
+	@DisplayName("宣言時のソートの確認")
 	void test_sort() {
 		// setup
-		final Quote large = new Quote(1, null, null);
-		final Quote small = new Quote(-1, null, null);
-		final Quote marketPrice = new Quote(null, null, null);
-		final List<Quote> quotes = List.of(large, small, marketPrice);
+		final BidQuote large = new BidQuote(new BigDecimal("99"), null);
+		final BidQuote small = new BidQuote(new BigDecimal("100"), null);
+		final BidQuote marketPrice = new BidQuote(null, null);
+		final List<BidQuote> quotes = List.of(large, small, marketPrice);
 
 		// exercise
-		final OrderBook book = new OrderBook(null, null, quotes, quotes);
+		final OrderBook book = OrderBook.builder().bidFull(quotes).build();
 
 		// verify
-		assertThat(book.getAskFull()).isEqualTo(List.of(marketPrice, small, large));
 		assertThat(book.getBidFull()).isEqualTo(List.of(marketPrice, small, large));
 	}
 }

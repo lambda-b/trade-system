@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class BidQuote implements Quote {
+public class BidQuote implements Quote<BidQuote> {
 
 	/** COMPARATOR */
 	private static Comparator<BigDecimal> COMPARATOR = Comparator.nullsFirst(Comparator.reverseOrder());
@@ -25,5 +25,10 @@ public class BidQuote implements Quote {
 	@Override
 	public boolean isBetterOrEqual(final BigDecimal price) {
 		return COMPARATOR.compare(this.price, price) <= 0;
+	}
+
+	@Override
+	public int compareTo(final BidQuote other) {
+		return COMPARATOR.compare(this.price, other.price);
 	}
 }
