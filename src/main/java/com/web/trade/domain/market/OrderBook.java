@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -18,14 +19,17 @@ public class OrderBook {
 	/** 参考価格　*/
 	private final BigDecimal referencePrice;
 
-	/** フル板情報(売) */
+	/** フル板情報(売) - Builder処理でソートされているものとして取り扱う */
 	private final List<AskQuote> askFull;
 
-	/** フル板情報(買) */
+	/** フル板情報(買) - Builder処理でソートされているものとして取り扱う */
 	private final List<BidQuote> bidFull;
 
 	/** 呼値 */
 	private final BigDecimal tick;
+
+	/** 表示件数 */
+	private final static int DISPLAY_NUMBER = 10;
 
 	public BigDecimal getBasePrice() {
 		return expectedExecutionPrice != null ? expectedExecutionPrice : referencePrice;
@@ -71,10 +75,59 @@ public class OrderBook {
 		return getBetterQty(bestPrice, bidFull);
 	}
 
+	public List<AskQuote> getDisplayAskBoard() {
+		final BigDecimal bestPrice = getBestAskPrice();
+		final BigDecimal bestQty = getBetterQty(bestPrice, askFull);
+		final AskQuote bestQuote = new AskQuote(bestPrice, bestQty);
+		return Stream.concat(Stream.of(bestQuote), askFull.stream()
+				.filter(e -> !e.isBetterOrEqual(bestPrice))
+				.limit(DISPLAY_NUMBER - 1))
+				.collect(Collectors.toList());
+	}
+
+	public List<BidQuote> getDisplayBidBoard() {
+		final BigDecimal bestPrice = getBestBidPrice();
+		final BigDecimal bestQty = getBetterQty(bestPrice, bidFull);
+		final BidQuote bestQuote = new BidQuote(bestPrice, bestQty);
+		return Stream.concat(Stream.of(bestQuote), bidFull.stream()
+				.filter(e -> !e.isBetterOrEqual(bestPrice))
+				.limit(DISPLAY_NUMBER - 1))
+				.collect(Collectors.toList());
+	}
+
+	public BigDecimal getOverAskQty() {
+		final BigDecimal lastDisplayPrice = getDisplayAskBoard().stream()
+				.reduce((first, second) -> second)
+				.map(Quote::getPrice)
+				.orElse(null);
+		return getWorseQty(lastDisplayPrice, askFull);
+	}
+
+	public BigDecimal getUnderBidQty() {
+		final BigDecimal lastDisplayPrice = getDisplayBidBoard().stream()
+				.reduce((first, second) -> second)
+				.map(Quote::getPrice)
+				.orElse(null);
+		return getWorseQty(lastDisplayPrice, bidFull);
+	}
+
 	private static <T extends Quote<T>> BigDecimal getBetterQty(final BigDecimal price,
 			final Collection<T> collection) {
+		if (price == null) {
+			return BigDecimal.ZERO;
+		}
 		return collection.stream()
 				.filter(e -> e.isBetterOrEqual(price))
+				.map(Quote::getQty)
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+	}
+
+	private static <T extends Quote<T>> BigDecimal getWorseQty(final BigDecimal price, final Collection<T> collection) {
+		if (price == null) {
+			return BigDecimal.ZERO;
+		}
+		return collection.stream()
+				.filter(e -> !e.isBetterOrEqual(price))
 				.map(Quote::getQty)
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
