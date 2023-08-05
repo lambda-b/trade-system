@@ -138,7 +138,7 @@ public class OrderBook {
 		 * @param askFull
 		 * @return builder
 		 */
-		public Builder askFull(final List<AskQuote> askFull) {
+		public Builder askQuotes(final List<AskQuote> askFull) {
 			this.askQuotes = askFull.stream().sorted().collect(Collectors.toList());
 			return this;
 		}
@@ -148,7 +148,7 @@ public class OrderBook {
 		 * @param bidFull
 		 * @return builder
 		 */
-		public Builder bidFull(final List<BidQuote> bidFull) {
+		public Builder bidQuotes(final List<BidQuote> bidFull) {
 			this.bidQuotes = bidFull.stream().sorted().collect(Collectors.toList());
 			return this;
 		}
