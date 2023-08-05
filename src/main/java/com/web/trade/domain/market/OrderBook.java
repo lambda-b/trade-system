@@ -2,6 +2,7 @@ package com.web.trade.domain.market;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -14,16 +15,13 @@ import lombok.Getter;
 public class OrderBook {
 
 	/** 予想約定価格 */
-	private final BigDecimal expectedExecutionPrice;
-
-	/** 参考価格　*/
-	private final BigDecimal referencePrice;
+	private final BigDecimal expectedExecPrice;
 
 	/** フル板情報(売) - Builder処理でソートされているものとして取り扱う */
-	private final List<AskQuote> askFull;
+	private final List<AskQuote> askQuotes;
 
 	/** フル板情報(買) - Builder処理でソートされているものとして取り扱う */
-	private final List<BidQuote> bidFull;
+	private final List<BidQuote> bidQuotes;
 
 	/** 呼値 */
 	private final BigDecimal tick;
@@ -32,113 +30,114 @@ public class OrderBook {
 	private final static int DISPLAY_NUMBER = 10;
 
 	public BigDecimal getBasePrice() {
-		return expectedExecutionPrice != null ? expectedExecutionPrice : referencePrice;
+		return expectedExecPrice;
 	}
 
-	public BigDecimal getBaseAskQty() {
-		final BigDecimal basePrice = getBasePrice();
-		return getBetterQty(basePrice, askFull);
-	}
-
-	public BigDecimal getBaseBidQty() {
-		final BigDecimal basePrice = getBasePrice();
-		return getBetterQty(basePrice, bidFull);
+	public boolean isMatching() {
+		return expectedExecPrice != null;
 	}
 
 	public BigDecimal getBestAskPrice() {
-		final BigDecimal basePrice = getBasePrice();
-		final BigDecimal baseAskQty = getBaseAskQty();
-		final BigDecimal baseBidQty = getBaseBidQty();
-		if (baseAskQty.compareTo(baseBidQty) < 0) {
-			return basePrice.add(tick);
+		if (!isMatching()) {
+			return getFirstPrice(askQuotes);
 		}
-		return basePrice;
+		final BigDecimal baseAskQty = getBetterQty(askQuotes, expectedExecPrice);
+		final BigDecimal baseBidQty = getBetterQty(bidQuotes, expectedExecPrice);
+		if (baseAskQty.compareTo(baseBidQty) < 0) {
+			return expectedExecPrice.add(tick);
+		}
+		return expectedExecPrice;
 	}
 
 	public BigDecimal getBestBidPrice() {
-		final BigDecimal basePrice = getBasePrice();
-		final BigDecimal baseAskQty = getBaseAskQty();
-		final BigDecimal baseBidQty = getBaseBidQty();
-		if (baseAskQty.compareTo(baseBidQty) > 0) {
-			return basePrice.subtract(tick);
+		if (!isMatching()) {
+			return getFirstPrice(bidQuotes);
 		}
-		return basePrice;
+		final BigDecimal baseAskQty = getBetterQty(askQuotes, expectedExecPrice);
+		final BigDecimal baseBidQty = getBetterQty(bidQuotes, expectedExecPrice);
+		if (baseAskQty.compareTo(baseBidQty) > 0) {
+			return expectedExecPrice.subtract(tick);
+		}
+		return expectedExecPrice;
 	}
 
 	public BigDecimal getBestAskQty() {
 		final BigDecimal bestPrice = getBestAskPrice();
-		return getBetterQty(bestPrice, askFull);
+		return getBetterQty(askQuotes, bestPrice);
 	}
 
 	public BigDecimal getBestBidQty() {
 		final BigDecimal bestPrice = getBestAskPrice();
-		return getBetterQty(bestPrice, bidFull);
+		return getBetterQty(bidQuotes, bestPrice);
 	}
 
-	public List<AskQuote> getDisplayAskBoard() {
+	public List<AskQuote> getAskBoard() {
 		final BigDecimal bestPrice = getBestAskPrice();
-		final BigDecimal bestQty = getBetterQty(bestPrice, askFull);
-		final AskQuote bestQuote = new AskQuote(bestPrice, bestQty);
-		return Stream.concat(Stream.of(bestQuote), askFull.stream()
-				.filter(e -> !e.isBetterOrEqual(bestPrice))
-				.limit(DISPLAY_NUMBER - 1))
-				.collect(Collectors.toList());
+		if (bestPrice == null) {
+			return Collections.emptyList();
+		}
+		final BigDecimal bestQty = getBetterQty(askQuotes, bestPrice);
+		return getDisplay(askQuotes, new AskQuote(bestPrice, bestQty));
 	}
 
-	public List<BidQuote> getDisplayBidBoard() {
+	public List<BidQuote> getBidBoard() {
 		final BigDecimal bestPrice = getBestBidPrice();
-		final BigDecimal bestQty = getBetterQty(bestPrice, bidFull);
-		final BidQuote bestQuote = new BidQuote(bestPrice, bestQty);
-		return Stream.concat(Stream.of(bestQuote), bidFull.stream()
-				.filter(e -> !e.isBetterOrEqual(bestPrice))
-				.limit(DISPLAY_NUMBER - 1))
-				.collect(Collectors.toList());
+		if (bestPrice == null) {
+			return Collections.emptyList();
+		}
+		final BigDecimal bestQty = getBetterQty(bidQuotes, bestPrice);
+		return getDisplay(bidQuotes, new BidQuote(bestPrice, bestQty));
 	}
 
 	public BigDecimal getOverAskQty() {
-		final BigDecimal lastDisplayPrice = getDisplayAskBoard().stream()
-				.reduce((first, second) -> second)
-				.map(Quote::getPrice)
-				.orElse(null);
-		return getWorseQty(lastDisplayPrice, askFull);
+		final List<AskQuote> askBoard = getAskBoard();
+		final BigDecimal sumQty = getSumQty(askQuotes);
+		final BigDecimal displayQty = getSumQty(askBoard);
+		return sumQty.subtract(displayQty);
 	}
 
 	public BigDecimal getUnderBidQty() {
-		final BigDecimal lastDisplayPrice = getDisplayBidBoard().stream()
-				.reduce((first, second) -> second)
-				.map(Quote::getPrice)
-				.orElse(null);
-		return getWorseQty(lastDisplayPrice, bidFull);
+		final List<BidQuote> bidBoard = getBidBoard();
+		final BigDecimal sumQty = getSumQty(bidQuotes);
+		final BigDecimal displayQty = getSumQty(bidBoard);
+		return sumQty.subtract(displayQty);
 	}
 
-	private static <T extends Quote<T>> BigDecimal getBetterQty(final BigDecimal price,
-			final Collection<T> collection) {
-		if (price == null) {
-			return BigDecimal.ZERO;
-		}
-		return collection.stream()
+	private static <T extends Quote> BigDecimal getBetterQty(final Collection<T> quotes, final BigDecimal price) {
+
+		return quotes.stream()
 				.filter(e -> e.isBetterOrEqual(price))
 				.map(Quote::getQty)
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
-	private static <T extends Quote<T>> BigDecimal getWorseQty(final BigDecimal price, final Collection<T> collection) {
-		if (price == null) {
-			return BigDecimal.ZERO;
-		}
-		return collection.stream()
-				.filter(e -> !e.isBetterOrEqual(price))
+	private static <T extends Quote> BigDecimal getSumQty(final Collection<T> quotes) {
+		return quotes.stream()
 				.map(Quote::getQty)
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
+	}
+
+	private static <T extends Quote> List<T> getDisplay(final Collection<T> quotes, final T bestQuote) {
+		return Stream.concat(Stream.of(bestQuote), quotes.stream()
+				.filter(e -> !e.isBetterOrEqual(bestQuote.getPrice())))
+				.limit(DISPLAY_NUMBER)
+				.collect(Collectors.toList());
+	}
+
+	private static <T extends Quote> BigDecimal getFirstPrice(final Collection<T> quotes) {
+		return quotes.stream()
+				.findFirst()
+				.map(Quote::getPrice)
+				.orElse(null);
 	}
 
 	public static class Builder {
 
 		/** askFull */
-		private List<AskQuote> askFull;
+		private List<AskQuote> askQuotes;
 
 		/** bidFull */
-		private List<BidQuote> bidFull;
+		private List<BidQuote> bidQuotes;
 
 		/**
 		 * askFull設定
@@ -146,7 +145,7 @@ public class OrderBook {
 		 * @return builder
 		 */
 		public Builder askFull(final List<AskQuote> askFull) {
-			this.askFull = askFull.stream().sorted().collect(Collectors.toList());
+			this.askQuotes = askFull.stream().sorted().collect(Collectors.toList());
 			return this;
 		}
 
@@ -156,7 +155,7 @@ public class OrderBook {
 		 * @return builder
 		 */
 		public Builder bidFull(final List<BidQuote> bidFull) {
-			this.bidFull = bidFull.stream().sorted().collect(Collectors.toList());
+			this.bidQuotes = bidFull.stream().sorted().collect(Collectors.toList());
 			return this;
 		}
 	}

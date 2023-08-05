@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 /**
  * 気配
  */
-public interface Quote<T extends Quote<T>> extends Comparable<T> {
+public interface Quote {
 
 	/**
 	 * 価格取得

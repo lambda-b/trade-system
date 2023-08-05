@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class AskQuote implements Quote<AskQuote> {
+public class AskQuote implements Quote, Comparable<AskQuote> {
 
 	/** COMPARATOR */
 	private static Comparator<BigDecimal> COMPARATOR = Comparator.nullsFirst(Comparator.naturalOrder());
