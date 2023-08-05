@@ -24,11 +24,15 @@ public class BidQuote implements Quote, Comparable<BidQuote> {
 
 	@Override
 	public boolean isBetterOrEqual(final BigDecimal price) {
-		return COMPARATOR.compare(this.price, price) <= 0;
+		final BigDecimal self = COMPARATOR.compare(this.price, Quote.MARKET_PRICE) == 0 ? null : price;
+		final BigDecimal param = COMPARATOR.compare(price, Quote.MARKET_PRICE) == 0 ? null : price;
+		return COMPARATOR.compare(self, param) <= 0;
 	}
 
 	@Override
 	public int compareTo(final BidQuote other) {
-		return COMPARATOR.compare(this.price, other.price);
+		final BigDecimal self = COMPARATOR.compare(this.price, Quote.MARKET_PRICE) == 0 ? null : this.price;
+		final BigDecimal param = COMPARATOR.compare(other.price, Quote.MARKET_PRICE) == 0 ? null : other.price;
+		return COMPARATOR.compare(self, param);
 	}
 }
