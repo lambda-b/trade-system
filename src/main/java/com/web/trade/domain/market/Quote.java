@@ -8,6 +8,12 @@ import java.math.BigDecimal;
 public interface Quote {
 
 	/**
+	 * 成行価格を表すオブジェクト<br>
+	 * null が成行を表すものとする
+	 */
+	BigDecimal MARKET_PRICE = null;
+
+	/**
 	 * 価格取得
 	 * @return price
 	 */

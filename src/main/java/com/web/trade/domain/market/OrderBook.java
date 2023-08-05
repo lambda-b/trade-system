@@ -29,12 +29,16 @@ public class OrderBook {
 	/** 表示件数 */
 	private final static int DISPLAY_NUMBER = 10;
 
-	public BigDecimal getBasePrice() {
-		return expectedExecPrice;
-	}
-
 	public boolean isMatching() {
 		return expectedExecPrice != null;
+	}
+
+	public BigDecimal getMarketAskQty() {
+		return getBetterQty(askQuotes, Quote.MARKET_PRICE);
+	}
+
+	public BigDecimal getMarketBidQty() {
+		return getBetterQty(bidQuotes, Quote.MARKET_PRICE);
 	}
 
 	public BigDecimal getBestAskPrice() {
@@ -59,16 +63,6 @@ public class OrderBook {
 			return expectedExecPrice.subtract(tick);
 		}
 		return expectedExecPrice;
-	}
-
-	public BigDecimal getBestAskQty() {
-		final BigDecimal bestPrice = getBestAskPrice();
-		return getBetterQty(askQuotes, bestPrice);
-	}
-
-	public BigDecimal getBestBidQty() {
-		final BigDecimal bestPrice = getBestAskPrice();
-		return getBetterQty(bidQuotes, bestPrice);
 	}
 
 	public List<AskQuote> getAskBoard() {
