@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Objects;
 
 import com.web.trade.domain.SecurityToken;
+import com.web.trade.domain.marketdata.MarketPrice;
+import com.web.trade.domain.master.StMaster;
 import com.web.trade.enums.TradeSessionStatus;
+import com.web.trade.utils.OptionalChain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,10 +35,25 @@ public class DayTradeSession implements TradeSession {
 
 	@Override
 	public BigDecimal getReferencePrice(final SecurityToken token) {
-		final BigDecimal basePrice = token.getStMaster().getBasePrice();
-		final BigDecimal amClosePrice = token.getMarketPrice().getAmClosePrice();
-		final BigDecimal pmClosePrice = token.getMarketPrice().getPmClosePrice();
-		final BigDecimal expectedExecPrice = token.getMarketPrice().getExpectedExecPrice();
+		final BigDecimal basePrice = OptionalChain.target(token)
+				.chain(SecurityToken::getStMaster)
+				.chain(StMaster::getBasePrice)
+				.result();
+
+		final BigDecimal amClosePrice = OptionalChain.target(token)
+				.chain(SecurityToken::getMarketPrice)
+				.chain(MarketPrice::getAmClosePrice)
+				.result();
+		final BigDecimal pmClosePrice = OptionalChain.target(token)
+				.chain(SecurityToken::getMarketPrice)
+				.chain(MarketPrice::getPmClosePrice)
+				.result();
+
+		final BigDecimal expectedExecPrice = OptionalChain.target(token)
+				.chain(SecurityToken::getMarketPrice)
+				.chain(MarketPrice::getExpectedExecPrice)
+				.result();
+
 		return List.of(expectedExecPrice, pmClosePrice, amClosePrice, basePrice).stream()
 				.filter(Objects::nonNull)
 				.findFirst()
