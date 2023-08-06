@@ -3,7 +3,7 @@ package com.web.trade.domain;
 import java.math.BigDecimal;
 
 import com.web.trade.domain.marketdata.MarketPrice;
-import com.web.trade.domain.master.StMaster;
+import com.web.trade.domain.master.SecurityMaster;
 import com.web.trade.domain.session.TradeSession;
 
 import lombok.Builder;
@@ -13,11 +13,11 @@ import lombok.Getter;
  * セキュリティトークン
  */
 @Builder
-public class SecurityToken {
+public class Security {
 
 	/** 銘柄マスタ */
 	@Getter
-	private final StMaster stMaster;
+	private final SecurityMaster master;
 
 	/** 市場価格 */
 	@Getter

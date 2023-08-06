@@ -2,7 +2,7 @@ package com.web.trade.domain.session;
 
 import java.math.BigDecimal;
 
-import com.web.trade.domain.SecurityToken;
+import com.web.trade.domain.Security;
 import com.web.trade.enums.TradeSessionStatus;
 
 /**
@@ -32,6 +32,6 @@ public interface TradeSession {
 	 * セキュリティトークンの参考価格を算出
 	 * @return 参考価格
 	 */
-	public BigDecimal getReferencePrice(SecurityToken token);
+	public BigDecimal getReferencePrice(Security security);
 
 }

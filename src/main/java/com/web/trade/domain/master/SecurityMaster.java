@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
-public class StMaster {
+public class SecurityMaster {
 
 	/** 銘柄コード */
 	private final String code;

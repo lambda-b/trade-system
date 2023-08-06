@@ -2,8 +2,10 @@ package com.web.trade.domain.session;
 
 import java.math.BigDecimal;
 
-import com.web.trade.domain.SecurityToken;
+import com.web.trade.domain.Security;
+import com.web.trade.domain.master.SecurityMaster;
 import com.web.trade.enums.TradeSessionStatus;
+import com.web.trade.utils.OptionalChain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,7 +31,10 @@ public class NightTradeSession implements TradeSession {
 	}
 
 	@Override
-	public BigDecimal getReferencePrice(final SecurityToken token) {
-		return token.getStMaster().getBasePrice();
+	public BigDecimal getReferencePrice(final Security security) {
+		return OptionalChain.target(security)
+				.chain(Security::getMaster)
+				.chain(SecurityMaster::getBasePrice)
+				.result();
 	}
 }
