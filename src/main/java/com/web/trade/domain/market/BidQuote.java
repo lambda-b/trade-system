@@ -24,7 +24,7 @@ public class BidQuote implements Quote, Comparable<BidQuote> {
 
 	@Override
 	public boolean isBetterOrEqual(final BigDecimal price) {
-		final BigDecimal self = COMPARATOR.compare(this.price, Quote.MARKET_PRICE) == 0 ? null : price;
+		final BigDecimal self = COMPARATOR.compare(this.price, Quote.MARKET_PRICE) == 0 ? null : this.price;
 		final BigDecimal param = COMPARATOR.compare(price, Quote.MARKET_PRICE) == 0 ? null : price;
 		return COMPARATOR.compare(self, param) <= 0;
 	}
