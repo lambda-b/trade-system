@@ -10,7 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 /**
- * セキュリティトークン
+ * 銘柄情報
  */
 @Builder
 public class Security {

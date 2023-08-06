@@ -29,7 +29,7 @@ public interface TradeSession {
 	public boolean isOrderAcceptable();
 
 	/**
-	 * セキュリティトークンの参考価格を算出
+	 * 銘柄の参考価格を算出
 	 * @return 参考価格
 	 */
 	public BigDecimal getReferencePrice(Security security);
