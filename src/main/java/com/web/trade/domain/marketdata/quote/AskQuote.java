@@ -1,4 +1,4 @@
-package com.web.trade.domain.market;
+package com.web.trade.domain.marketdata.quote;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
@@ -7,14 +7,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 買気配
+ * 売気配
  */
 @Getter
 @AllArgsConstructor
-public class BidQuote implements Quote, Comparable<BidQuote> {
+public class AskQuote implements Quote, Comparable<AskQuote> {
 
 	/** COMPARATOR */
-	private static Comparator<BigDecimal> COMPARATOR = Comparator.nullsFirst(Comparator.reverseOrder());
+	private static Comparator<BigDecimal> COMPARATOR = Comparator.nullsFirst(Comparator.naturalOrder());
 
 	/** price */
 	private final BigDecimal price;
@@ -30,9 +30,10 @@ public class BidQuote implements Quote, Comparable<BidQuote> {
 	}
 
 	@Override
-	public int compareTo(final BidQuote other) {
+	public int compareTo(final AskQuote other) {
 		final BigDecimal self = COMPARATOR.compare(this.price, Quote.MARKET_PRICE) == 0 ? null : this.price;
-		final BigDecimal param = COMPARATOR.compare(other.price, Quote.MARKET_PRICE) == 0 ? null : other.price;
+		final BigDecimal param = COMPARATOR.compare(price, Quote.MARKET_PRICE) == 0 ? null : price;
 		return COMPARATOR.compare(self, param);
 	}
+
 }

@@ -1,4 +1,4 @@
-package com.web.trade.domain.market;
+package com.web.trade.domain.marketdata;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -9,6 +9,10 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import com.web.trade.domain.marketdata.quote.AskQuote;
+import com.web.trade.domain.marketdata.quote.BidQuote;
+import com.web.trade.domain.marketdata.quote.Quote;
 
 /**
  * OrderBookTest

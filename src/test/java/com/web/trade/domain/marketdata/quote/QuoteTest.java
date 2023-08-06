@@ -1,4 +1,4 @@
-package com.web.trade.domain.market;
+package com.web.trade.domain.marketdata.quote;
 
 import static org.assertj.core.api.Assertions.*;
 

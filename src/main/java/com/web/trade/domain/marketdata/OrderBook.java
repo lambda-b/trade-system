@@ -1,4 +1,4 @@
-package com.web.trade.domain.market;
+package com.web.trade.domain.marketdata;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -6,6 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.web.trade.domain.marketdata.quote.AskQuote;
+import com.web.trade.domain.marketdata.quote.BidQuote;
+import com.web.trade.domain.marketdata.quote.Quote;
 
 import lombok.Builder;
 import lombok.Getter;
