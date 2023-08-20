@@ -1,14 +1,15 @@
 package com.web.trade.domain.order;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import com.web.trade.enums.HoldingType;
 import com.web.trade.enums.OrdStatus;
 import com.web.trade.enums.OrdType;
 import com.web.trade.enums.SideOfOrder;
+import com.web.trade.utils.CalcUtils;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -65,11 +66,63 @@ public class Order {
 	private final OrderEstimate estimate;
 
 	/**
-	 * 本来概算値が存在しないことは業務的にありえないが、<br>
-	 * APIから取得できないことを加味してOptionalの取扱いにする
-	 * @return 概算値
+	 * 未約定の数量を取得
+	 * @return 未約定数量
 	 */
-	public Optional<OrderEstimate> getEstimate() {
-		return Optional.ofNullable(estimate);
+	public BigDecimal getUnfilledQty() {
+		return CalcUtils.subtract(qty, execQty);
+	}
+
+	/**
+	 * 注文がすべて約定済かどうかの判定<br>
+	 * 注文数量と約定数量の比較により判定する
+	 * @return true: すべて約定済み / false: 未約定を含む
+	 */
+	public boolean isFullyFilled() {
+		return CalcUtils.isNullOrZero(getUnfilledQty());
+	}
+
+	/**
+	 * 概算約定代金取得
+	 * @return 概算約定代金
+	 */
+	public BigDecimal getEstimateExecAmount() {
+		if (estimate == null) {
+			return null;
+		}
+		return estimate.getExecAmount();
+	}
+
+	/**
+	 * 概算受渡金額取得
+	 * @return 概算受渡金額
+	 */
+	public BigDecimal getEstimateSettlementAmount() {
+		if (estimate == null) {
+			return null;
+		}
+		return estimate.getSettlementAmount();
+	}
+
+	/**
+	 * 受渡予定日取得
+	 * @return 受渡予定日
+	 */
+	public LocalDate getEstimateSettlementDate() {
+		if (estimate == null) {
+			return null;
+		}
+		return estimate.getSettlementDate();
+	}
+
+	/**
+	 * 概算手数料取得
+	 * @return 概算手数料
+	 */
+	public BigDecimal getEstimateCommission() {
+		if (estimate == null) {
+			return null;
+		}
+		return estimate.getCommission();
 	}
 }
