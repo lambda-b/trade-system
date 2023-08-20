@@ -27,6 +27,9 @@ public class Order {
 	/** 銘柄コード */
 	private final String securityCode;
 
+	/** 銘柄名 */
+	private final String securityName;
+
 	/** 預り区分 */
 	private final HoldingType holdingType;
 
