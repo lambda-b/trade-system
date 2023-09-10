@@ -43,8 +43,8 @@ public class OrderViewTest {
 
 		// verify
 		assertThat(result).hasSize(2);
-		assertThat(result).isInstanceOf(UnfilledOrderDetailView.class);
-		assertThat(result).isInstanceOf(FilledOrderDetailView.class);
+		assertThat(result.get(0)).isInstanceOf(UnfilledOrderDetailView.class);
+		assertThat(result.get(1)).isInstanceOf(FilledOrderDetailView.class);
 	}
 
 	void test_getDetails3() {

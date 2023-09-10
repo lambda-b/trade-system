@@ -11,10 +11,10 @@ import lombok.Getter;
 public enum OrdStatus {
 
 	/** 受付中 */
-	NEW("受付中"),
+	PENDING_NEW("受付中"),
 
 	/** 発注中 */
-	PENDING_NEW("発注中"),
+	NEW("発注中"),
 
 	/** 約定(一部) */
 	PARTIALLY_FILLED("約定(一部)"),
