@@ -5,13 +5,13 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
+import com.web.trade.annotation.MockJsonRestController;
 import com.web.trade.dto.PersonApiOut;
 
 import lombok.RequiredArgsConstructor;
 
-@RestController
+@MockJsonRestController
 @RequiredArgsConstructor
 public class PersonController {
 
