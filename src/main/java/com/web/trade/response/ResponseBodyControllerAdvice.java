@@ -16,12 +16,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.AbstractMappingJacksonResponseBodyAdvice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.web.trade.annotation.MockJsonRestController;
 import com.web.trade.utils.UnderScore;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RestControllerAdvice
+@RestControllerAdvice(annotations = { MockJsonRestController.class })
 public class ResponseBodyControllerAdvice extends AbstractMappingJacksonResponseBodyAdvice {
 
 	/** ObjectMapper */

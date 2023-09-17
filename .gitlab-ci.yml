@@ -1,0 +1,32 @@
+image: openjdk:11
+
+stages:
+  - build
+  - test
+  
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+  - chmod +x ./gradlew
+  
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+    
+build:
+  stage: build
+  script:
+    - ./gradlew assemble
+  artifacts:
+    paths:
+      - build/libs/*.jar
+  only:
+    - main
+    
+test:
+  stage: test
+  script:
+    - ./gradlew check
+  artifacts:
+    reports:
+      junit: build/reports/tests/**/index.html
