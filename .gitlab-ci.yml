@@ -29,4 +29,4 @@ test:
     - ./gradlew check
   artifacts:
     reports:
-      junit: build/reports/test/**/index.html
+      junit: build/reports/tests/**/index.html
