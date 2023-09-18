@@ -38,7 +38,8 @@ test:
 pages:
   stage: deploy
   script:
-    - echo "Hello World!" > public/index.html
+    - mkdir public
+    - cp docs/index.html public
   artifacts:
     paths:
       - docs
