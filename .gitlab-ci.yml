@@ -1,9 +1,13 @@
 image: openjdk:11
 
+variables:
+  VERSION: 0.0.1-SNAPSHOT
+
 stages:
   - build
   - test
-  
+  - deploy
+
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
   - chmod +x ./gradlew
@@ -30,3 +34,13 @@ test:
   artifacts:
     reports:
       junit: build/reports/tests/**/index.html
+    
+pages:
+  stage: deploy
+  script:
+    - echo "Hello World!" > public/index.html
+  artifacts:
+    paths:
+      - docs
+  only:
+    - main
