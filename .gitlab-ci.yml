@@ -37,9 +37,8 @@ test:
     
 pages:
   stage: deploy
-  before_script:
-    - java -jar build/libs/trade-system-$VERSION.jar
   script:
+    - java -jar build/libs/trade-system-$VERSION.jar &
     - mkdir public
     - echo "var spec = " > public/api-docs.js
     - curl -L http://localhost:8080/api-docs >> public/api-docs.js
