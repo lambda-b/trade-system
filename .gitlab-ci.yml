@@ -37,9 +37,13 @@ test:
     
 pages:
   stage: deploy
+  before_script:
+    - java -jar build/libs/trade-system-$VERSION.jar
   script:
     - mkdir public
-    - cp docs/index.html public
+    - echo "var spec = " > public/api-docs.js
+    - curl -L http://localhost:8080/api-docs >> public/api-docs.js
+    - cp -rp docs/* public
   artifacts:
     paths:
       - public
