@@ -42,6 +42,6 @@ pages:
     - cp docs/index.html public
   artifacts:
     paths:
-      - docs
+      - public
   only:
     - main
