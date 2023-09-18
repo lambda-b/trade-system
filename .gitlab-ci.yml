@@ -41,7 +41,7 @@ pages:
     - java -jar build/libs/trade-system-$VERSION.jar &
     - mkdir public
     - echo "var spec = " > public/api-docs.js
-    - curl -L http://localhost:8080/api-docs >> public/api-docs.js
+    - sleep 30; curl -L http://localhost:8080/api-docs >> public/api-docs.js
     - cp -rp docs/* public
   artifacts:
     paths:
