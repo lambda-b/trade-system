@@ -10,6 +10,8 @@ import java.util.stream.Stream;
 import com.web.trade.domain.marketdata.quote.AskQuote;
 import com.web.trade.domain.marketdata.quote.BidQuote;
 import com.web.trade.domain.marketdata.quote.Quote;
+import com.web.trade.domain.master.Tick;
+import com.web.trade.utils.CalcUtils;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -28,7 +30,7 @@ public class OrderBook {
 	private final List<BidQuote> bidQuotes;
 
 	/** 呼値 */
-	private final BigDecimal tick;
+	private final Tick tick;
 
 	/** 表示件数 */
 	private final static int DISPLAY_NUMBER = 10;
@@ -52,7 +54,8 @@ public class OrderBook {
 		final BigDecimal baseAskQty = getBetterQty(askQuotes, expectedExecPrice);
 		final BigDecimal baseBidQty = getBetterQty(bidQuotes, expectedExecPrice);
 		if (baseAskQty.compareTo(baseBidQty) < 0) {
-			return expectedExecPrice.add(tick);
+			final BigDecimal askTick = tick.getAskTick(expectedExecPrice);
+			return CalcUtils.add(expectedExecPrice, askTick);
 		}
 		return expectedExecPrice;
 	}
@@ -64,7 +67,8 @@ public class OrderBook {
 		final BigDecimal baseAskQty = getBetterQty(askQuotes, expectedExecPrice);
 		final BigDecimal baseBidQty = getBetterQty(bidQuotes, expectedExecPrice);
 		if (baseAskQty.compareTo(baseBidQty) > 0) {
-			return expectedExecPrice.subtract(tick);
+			final BigDecimal bidTick = tick.getBidTick(expectedExecPrice);
+			return CalcUtils.subtract(expectedExecPrice, bidTick);
 		}
 		return expectedExecPrice;
 	}

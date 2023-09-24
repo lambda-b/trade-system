@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.web.trade.domain.marketdata.quote.AskQuote;
 import com.web.trade.domain.marketdata.quote.BidQuote;
 import com.web.trade.domain.marketdata.quote.Quote;
+import com.web.trade.domain.master.Tick;
 
 /**
  * OrderBookTest
@@ -59,11 +61,12 @@ public class OrderBookTest {
 
 	private OrderBook createOrderBook(final BigDecimal expectedExecPrice, final List<AskQuote> askQuotes,
 			final List<BidQuote> bidQuotes) {
+		final Tick tick = Tick.create(List.of(Pair.of(BigDecimal.ZERO, BigDecimal.ONE)), Pair::getLeft, Pair::getRight);
 		return OrderBook.builder()
 				.expectedExecPrice(expectedExecPrice)
 				.askQuotes(askQuotes)
 				.bidQuotes(bidQuotes)
-				.tick(BigDecimal.ONE)
+				.tick(tick)
 				.build();
 	}
 
