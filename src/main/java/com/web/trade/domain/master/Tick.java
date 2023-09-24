@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.web.trade.utils.CalcUtils;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
@@ -18,16 +20,27 @@ public class Tick {
 	private final List<TickData> table;
 
 	/**
-	 * 呼値取得
+	 * bid方向の呼値取得
 	 * @param price
-	 * @return 呼値
+	 * @return 買い呼値
 	 */
-	public BigDecimal get(final BigDecimal price) {
+	public BigDecimal getBidTick(final BigDecimal price) {
 		return table.stream()
 				.filter(e -> e.start.compareTo(price) <= 0)
 				.max(TickData::compareTo)
 				.map(e -> e.value)
 				.orElse(null);
+	}
+
+	/**
+	 * ask方向の呼値取得
+	 * @param price
+	 * @return 売り呼値
+	 */
+	public BigDecimal getAskTick(final BigDecimal price) {
+		final BigDecimal bidTick = getBidTick(price);
+		final BigDecimal askFavorPrice = CalcUtils.add(price, bidTick);
+		return getBidTick(askFavorPrice);
 	}
 
 	/**
