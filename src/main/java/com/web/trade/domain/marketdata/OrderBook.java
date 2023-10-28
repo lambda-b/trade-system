@@ -93,16 +93,12 @@ public class OrderBook {
 
 	public BigDecimal getOverAskQty() {
 		final List<AskQuote> askBoard = getAskBoard();
-		final BigDecimal sumQty = getSumQty(askQuotes);
-		final BigDecimal displayQty = getSumQty(askBoard);
-		return sumQty.subtract(displayQty);
+		return getExtraQty(askBoard);
 	}
 
 	public BigDecimal getUnderBidQty() {
 		final List<BidQuote> bidBoard = getBidBoard();
-		final BigDecimal sumQty = getSumQty(bidQuotes);
-		final BigDecimal displayQty = getSumQty(bidBoard);
-		return sumQty.subtract(displayQty);
+		return getExtraQty(bidBoard);
 	}
 
 	private static <T extends Quote> BigDecimal getBetterQty(final Collection<T> quotes, final BigDecimal price) {
@@ -113,8 +109,9 @@ public class OrderBook {
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
-	private static <T extends Quote> BigDecimal getSumQty(final Collection<T> quotes) {
+	private static <T extends Quote> BigDecimal getExtraQty(final Collection<T> quotes) {
 		return quotes.stream()
+				.skip(DISPLAY_NUMBER)
 				.map(Quote::getQty)
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
